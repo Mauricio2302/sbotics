@@ -109,27 +109,27 @@ destravarG();
 }
 
 
-if(distanciaG <= 14 && distanciaG >= 6 && distancia == 300 && prata("sensorB")|| prata("sensorB2")){
+if(distanciaG <= 4 && distanciaG >= 3 && distancia == 300 && prata("sensorB")|| prata("sensorB2")){
 direita(120,120);
 await Time.Delay(60);
-frente(120,120);
-await Time.Delay(1100);
+frente(140,140);
+await Time.Delay(200);
 destravarB();
-levantarB(-300,-300);
+levantarB(-250,-250);
 await Time.Delay(300);
 destravarM();
-levantarM(500, 500);
-await Time.Delay(3260);
+levantarM(400, 400);
+await Time.Delay(2960);
 levantarM(-250, -250);
 await Time.Delay(760);
 travar();
 await Time.Delay(260);
 levantarB(150,150);
-await Time.Delay(1400);
-levantarM(500, 500);
-await Time.Delay(560);
+await Time.Delay(1500);
+levantarM(400, 400);
+await Time.Delay(760);
 levantarM(-250, -250);
-await Time.Delay(560);
+await Time.Delay(760);
 travarM();
 
 }
@@ -503,53 +503,17 @@ await Time.Delay(350);
 distanciafrente = Bot.GetComponent<UltrasonicSensor>("ultra_F").Analog.ToString();
 distanciadireita = Bot.GetComponent<UltrasonicSensor>("ultra_D").Analog.ToString();
 distanciagarra = Bot.GetComponent<UltrasonicSensor>("ultra_G").Analog.ToString();
-//distanciagarra2 = Bot.GetComponent<UltrasonicSensor>("ultra_G2").Analog.ToString();
-//distanciagarra3 = Bot.GetComponent<UltrasonicSensor>("ultra_G3").Analog.ToString();
 distancia = ultra_F.Analog;
 distanciaG = ultra_G.Analog;
 distanciaD = ultra_D.Analog;
 /*distanciaG2 = ultra_G2.Analog;
 distanciaG3 = ultra_G3.Analog;*/
 
-if(distanciaD >3 && distanciaD <7 && resgate == true){
-direita(250, 250);
-await Time.Delay(2380);
-frente(-200, -200);
-await Time.Delay(2200);
-
-
-if(distanciaG <= 3 && distanciaG >= 1 && cor_B == "Branco" || cor_B2 == "Branco"){
-frente(130,130);
-await Time.Delay(400);
-destravarB();
-levantarB(-300,-300);
-await Time.Delay(300);
-destravarM();
-levantarM(500, 500);
-await Time.Delay(3260);
-levantarM(-250, -250);
-await Time.Delay(760);
-levantarB(150,150);
-await Time.Delay(1400);
-levantarM(500, 500);
-await Time.Delay(560);
-levantarM(-250, -250);
-await Time.Delay(560);
-travarM();
 
 
 
-}
 
 
-}
-
-
-
-if(distancia < 4 && distancia > 1){
-	direita(300,300);
-	await Time.Delay(1822);
-}
 
 
 if(verde_A() && resgate == true){
@@ -561,8 +525,10 @@ if(verde_A() && resgate == true){
 	await Time.Delay(1750);
 	direita(300,300);
 	await Time.Delay(1822);
+	frente(-300,-300);
+	await Time.Delay(2050);
 	frente(160,160);
-	await Time.Delay(3050);
+	await Time.Delay(5050);
 	travar();
 	destravarG();
 	await Time.Delay(100);
@@ -577,11 +543,106 @@ if(verde_A() && resgate == true){
 	destravarB();
 	levantarB(300,300);
 	await Time.Delay(300);
-    touch();
- 
+
+
+	// resgate das vítimas
+    while(true){
+distanciafrente = Bot.GetComponent<UltrasonicSensor>("ultra_F").Analog.ToString();
+distanciadireita = Bot.GetComponent<UltrasonicSensor>("ultra_D").Analog.ToString();
+distanciagarra = Bot.GetComponent<UltrasonicSensor>("ultra_G").Analog.ToString();
+distancia = ultra_F.Analog;
+distanciaG = ultra_G.Analog;
+distanciaD = ultra_D.Analog;
+sensores_cor();
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+if(distanciaD >3 && distanciaD <7 && resgate == true){
+distanciafrente = Bot.GetComponent<UltrasonicSensor>("ultra_F").Analog.ToString();
+distanciadireita = Bot.GetComponent<UltrasonicSensor>("ultra_D").Analog.ToString();
+distanciagarra = Bot.GetComponent<UltrasonicSensor>("ultra_G").Analog.ToString();
+distancia = ultra_F.Analog;
+distanciaG = ultra_G.Analog;
+distanciaD = ultra_D.Analog;
+sensores_cor();
+frente(100,100);
+await Time.Delay(100);
+direita(250, 250);
+await Time.Delay(2280);
+frente(-200, -200);
+await Time.Delay(200);
+
+if(distanciaG <= 3 && distanciaG >= 1 && cor_B == "Branco" || cor_B2 == "Branco"){
+IO.PrintLine ("fake natty!");
+distanciafrente = Bot.GetComponent<UltrasonicSensor>("ultra_F").Analog.ToString();
+distanciadireita = Bot.GetComponent<UltrasonicSensor>("ultra_D").Analog.ToString();
+distanciagarra = Bot.GetComponent<UltrasonicSensor>("ultra_G").Analog.ToString();
+distancia = ultra_F.Analog;
+distanciaG = ultra_G.Analog;
+distanciaD = ultra_D.Analog;
+sensores_cor();
+frente(150,150);
+await Time.Delay(200);
+destravarB();
+levantarB(-250,-250);
+await Time.Delay(300);
+destravarM();
+levantarM(400, 400);
+await Time.Delay(660);
+levantarM(-250, -250);
+await Time.Delay(760);
+levantarB(150,150);
+await Time.Delay(1600);
+levantarM(400, 400);
+await Time.Delay(560);
+levantarM(-250, -250);
+await Time.Delay(560);
+travarM();
+
 }
 
 
+
+}
+
+
+if(verde_A() && resgate == true){
+distanciafrente = Bot.GetComponent<UltrasonicSensor>("ultra_F").Analog.ToString();
+distanciadireita = Bot.GetComponent<UltrasonicSensor>("ultra_D").Analog.ToString();
+distanciagarra = Bot.GetComponent<UltrasonicSensor>("ultra_G").Analog.ToString();
+distancia = ultra_F.Analog;
+distanciaG = ultra_G.Analog;
+distanciaD = ultra_D.Analog;
+sensores_cor();
+	destravar();
+	destravarB();
+	levantarB(-300,-300);
+	await Time.Delay(300);
+	frente(140,140);
+	await Time.Delay(1750);
+	direita(300,300);
+	await Time.Delay(1822);
+	frente(-300,-300);
+	await Time.Delay(2050);
+	frente(160,160);
+	await Time.Delay(5050);
+	travar();
+	destravarG();
+	await Time.Delay(100);
+	levantarG(320,320);
+	await Time.Delay(900);
+	levantarG(-320,-320);
+	await Time.Delay(400);
+	travarG();
+	destravar();
+	frente(110,110);
+	await Time.Delay(300);
+	destravarB();
+	levantarB(300,300);
+	await Time.Delay(300);
+	}
+ 
+	}
+}
 }
 }
 }
