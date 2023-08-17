@@ -127,9 +127,9 @@ await Time.Delay(260);
 levantarB(150,150);
 await Time.Delay(1500);
 levantarM(400, 400);
-await Time.Delay(760);
+await Time.Delay(660);
 levantarM(-250, -250);
-await Time.Delay(760);
+await Time.Delay(660);
 travarM();
 
 }
@@ -513,8 +513,13 @@ distanciaG3 = ultra_G3.Analog;*/
 
 
 
-
-
+if(distancia < 3 && distancia > 0){
+destravar();
+direita(300,300);
+await Time.Delay(1822);
+frente(-300,-300);
+await Time.Delay(1050);
+}
 
 if(verde_A() && resgate == true){
 	destravar();
@@ -528,7 +533,7 @@ if(verde_A() && resgate == true){
 	frente(-300,-300);
 	await Time.Delay(2050);
 	frente(160,160);
-	await Time.Delay(5050);
+	await Time.Delay(4050);
 	travar();
 	destravarG();
 	await Time.Delay(100);
@@ -554,7 +559,16 @@ distancia = ultra_F.Analog;
 distanciaG = ultra_G.Analog;
 distanciaD = ultra_D.Analog;
 sensores_cor();
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+await Time.Delay(100);
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+if(distancia < 3 && distancia > 0){
+destravar();
+direita(300,300);
+await Time.Delay(1822);
+frente(-300,-300);
+await Time.Delay(1050);
+}
 
 if(distanciaD >3 && distanciaD <7 && resgate == true){
 distanciafrente = Bot.GetComponent<UltrasonicSensor>("ultra_F").Analog.ToString();
@@ -569,7 +583,7 @@ await Time.Delay(100);
 direita(250, 250);
 await Time.Delay(2280);
 frente(-200, -200);
-await Time.Delay(200);
+await Time.Delay(900);
 
 if(distanciaG <= 3 && distanciaG >= 1 && cor_B == "Branco" || cor_B2 == "Branco"){
 IO.PrintLine ("fake natty!");
@@ -580,22 +594,23 @@ distancia = ultra_F.Analog;
 distanciaG = ultra_G.Analog;
 distanciaD = ultra_D.Analog;
 sensores_cor();
-frente(150,150);
-await Time.Delay(200);
+frente(-150,-150);
+await Time.Delay(1500);
+frente(150, 150);
 destravarB();
 levantarB(-250,-250);
-await Time.Delay(300);
+await Time.Delay(1100);
 destravarM();
 levantarM(400, 400);
-await Time.Delay(660);
+await Time.Delay(1660);
 levantarM(-250, -250);
-await Time.Delay(760);
+await Time.Delay(1660);
 levantarB(150,150);
 await Time.Delay(1600);
 levantarM(400, 400);
-await Time.Delay(560);
+await Time.Delay(960);
 levantarM(-250, -250);
-await Time.Delay(560);
+await Time.Delay(960);
 travarM();
 
 }
