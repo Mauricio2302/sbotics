@@ -298,7 +298,7 @@ destravar();
 	        direita(275,275);
 	        await Time.Delay(1892);
 frente(-240,-240);
-await Time.Delay(1050);
+await Time.Delay(1550);
 frente(200,200);
 }
 if(distanciaD >2 && distanciaD < 18){
@@ -311,7 +311,7 @@ distanciaD = ultra_D.Analog;
 IO.Print("Achei o baseball bat");
 sensores_cor();
 frente(100,100);
-await Time.Delay(15);
+await Time.Delay(110);
 	        direita(275,275);
 	        await Time.Delay(1892);
 frente(-200, -200);
@@ -328,9 +328,9 @@ distanciaD = ultra_D.Analog;
 sensores_cor();
 frente(200,200);
 }
-if(distanciaG <= 2.2 && distanciaG > 0  && withvictmin == false){
+if(distanciaG < 2 && distanciaG > 0  && withvictmin == false){
    await pegarvitima();
-    if(isgreen("bagColorR") && isgreen("bagColorL")){
+    if(isgreen("bagColorR") || isgreen("bagColorL")){
 		    await Time.Delay(10);
 	distanciafrente = Bot.GetComponent<UltrasonicSensor>("ultra_F").Analog.ToString();
 	distanciadireita = Bot.GetComponent<UltrasonicSensor>("ultra_D").Analog.ToString();
@@ -344,7 +344,7 @@ if(distanciaG <= 2.2 && distanciaG > 0  && withvictmin == false){
         IO.Print("No baseball bat");
         await Time.Delay(2000);
     }
-    if(bagColorR == "Preto" || bagColorR == "Branco"&& bagColorL == "Preto" || bagColorL == "Branco"){
+    if(bagColorR == "Preto" || bagColorR == "Branco" || bagColorL == "Preto" || bagColorL == "Branco"){
         withvictmin = true;
 	 await Time.Delay(10);
 	distanciafrente = Bot.GetComponent<UltrasonicSensor>("ultra_F").Analog.ToString();
@@ -371,7 +371,6 @@ if(distanciaG <= 2.2 && distanciaG > 0  && withvictmin == false){
 	frente(200,200);
 	        esquerda(275,275);
 	        await Time.Delay(1892);
-        await Time.Delay(2000);
     }
 }
 
@@ -400,7 +399,7 @@ while(withvictmin){
 	distanciaD = ultra_D.Analog;
 	sensores_cor();
 	frente(200,200);
-        while(distancia > 2 && red("sensorM")){
+        while(distancia > 2 ){
 			    await Time.Delay(10);
 	distanciafrente = Bot.GetComponent<UltrasonicSensor>("ultra_F").Analog.ToString();
 	distanciadireita = Bot.GetComponent<UltrasonicSensor>("ultra_D").Analog.ToString();
@@ -422,7 +421,7 @@ while(withvictmin){
         }
         
     } else{
-        while(distancia > 2 && !verde_A()){
+        while(distancia > 2 ){
 			    await Time.Delay(10);
 	distanciafrente = Bot.GetComponent<UltrasonicSensor>("ultra_F").Analog.ToString();
 	distanciadireita = Bot.GetComponent<UltrasonicSensor>("ultra_D").Analog.ToString();
@@ -435,6 +434,7 @@ while(withvictmin){
             frente(200, 200);
             await Time.Delay(1);
         }
+		   if(distancia <= 2){
 		    await Time.Delay(10);
 	distanciafrente = Bot.GetComponent<UltrasonicSensor>("ultra_F").Analog.ToString();
 	distanciadireita = Bot.GetComponent<UltrasonicSensor>("ultra_D").Analog.ToString();
@@ -446,6 +446,7 @@ while(withvictmin){
 	frente(200,200);
 	        direita(275,275);
 	        await Time.Delay(1892);
+	}
         }
         if(verde_A()){
 			    await Time.Delay(10);
@@ -465,6 +466,7 @@ while(withvictmin){
 }
 }
 }
+
 
 
 
@@ -680,7 +682,7 @@ async Task pegarcubo(){
 	direita(100,100);
 	await Time.Delay(100);
     frente(-200, -200);
-    await Time.Delay(1000);
+    await Time.Delay(1100);
     travar();
     destravarM();
     levantarM(300, 300); 
@@ -747,15 +749,15 @@ async Task desvio(){
 	direita(300,300);
 	await Time.Delay(1832);
 	frente(100, 100);
-	await Time.Delay(3200);
+	await Time.Delay(3100);
 	esquerda(300,300);
 	await Time.Delay(1832);
 	frente(100, 100);
-	await Time.Delay(7500);
+	await Time.Delay(7100);
 	esquerda(300,300);
 	await Time.Delay(1832);
 	frente(100, 100);
-	await Time.Delay(4150);
+	await Time.Delay(4050);
 	direita(300,300);
 	await Time.Delay(1832);
 	frente(-200,-200);
@@ -764,7 +766,7 @@ async Task desvio(){
 
 async Task pegarvitima(){
  frente(-200, -200);
-    await Time.Delay(1000);
+    await Time.Delay(1150);
     travar();
     destravarM();
     levantarM(400, 400); 
@@ -791,7 +793,7 @@ async Task pegarvitima(){
     travarM();
     destravar();
 }
-
+//
 async Task droparvitima(){
             destravar();
 	        destravarB();
