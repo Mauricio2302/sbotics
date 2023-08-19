@@ -109,7 +109,7 @@ destravarG();
 }
 
 
-if(distanciaG <= 2 && distanciaG >=0 && distancia>=10 && (prata("sensorB") || prata("sensorB2") )){
+if(distanciaG <= 2.1 && distanciaG >=0 && distancia>=10 && (prata("sensorB") || prata("sensorB2") )){
 await pegarcubo();
 }
 
@@ -268,8 +268,8 @@ distanciaG = ultra_G.Analog;
 distanciaD = ultra_D.Analog;
 if(distancia < 3 && distancia > 0){
 destravar();
-direita(275,275);
-await Time.Delay(1732);
+	        direita(275,275);
+	        await Time.Delay(1892);
 frente(-240,-240);
 await Time.Delay(2050);
 frente(200,200);
@@ -295,8 +295,8 @@ distanciaG = ultra_G.Analog;
 distanciaD = ultra_D.Analog;
 if(distancia < 3 && distancia > 0){
 destravar();
-direita(275,275);
-await Time.Delay(1732);
+	        direita(275,275);
+	        await Time.Delay(1892);
 frente(-240,-240);
 await Time.Delay(1050);
 frente(200,200);
@@ -311,9 +311,9 @@ distanciaD = ultra_D.Analog;
 IO.Print("Achei o baseball bat");
 sensores_cor();
 frente(100,100);
-await Time.Delay(105);
-direita(275,275);
-await Time.Delay(2200);
+await Time.Delay(15);
+	        direita(275,275);
+	        await Time.Delay(1892);
 frente(-200, -200);
 await Time.Delay(3200);
 frente(200,200);
@@ -328,7 +328,7 @@ distanciaD = ultra_D.Analog;
 sensores_cor();
 frente(200,200);
 }
-if(distanciaG <= 2.4 && distanciaG > 0){
+if(distanciaG <= 2.2 && distanciaG > 0  && withvictmin == false){
    await pegarvitima();
     if(isgreen("bagColorR") && isgreen("bagColorL")){
 		    await Time.Delay(10);
@@ -344,7 +344,7 @@ if(distanciaG <= 2.4 && distanciaG > 0){
         IO.Print("No baseball bat");
         await Time.Delay(2000);
     }
-    else{
+    if(bagColorR == "Preto" || bagColorR == "Branco"&& bagColorL == "Preto" || bagColorL == "Branco"){
         withvictmin = true;
 	 await Time.Delay(10);
 	distanciafrente = Bot.GetComponent<UltrasonicSensor>("ultra_F").Analog.ToString();
@@ -369,8 +369,8 @@ if(distanciaG <= 2.4 && distanciaG > 0){
 	distanciaD = ultra_D.Analog;
 	sensores_cor();
 	frente(200,200);
-    esquerda(200, 200);
-    await Time.Delay(1780);
+	        esquerda(275,275);
+	        await Time.Delay(1892);
         await Time.Delay(2000);
     }
 }
@@ -379,7 +379,7 @@ if(distanciaG <= 2.4 && distanciaG > 0){
 
 }
 
-if(withvictmin){
+while(withvictmin){
 	    await Time.Delay(10);
 	distanciafrente = Bot.GetComponent<UltrasonicSensor>("ultra_F").Analog.ToString();
 	distanciadireita = Bot.GetComponent<UltrasonicSensor>("ultra_D").Analog.ToString();
@@ -414,12 +414,11 @@ if(withvictmin){
             await Time.Delay(1);
         }
         if(distancia <= 2){
-            direita(200, 200);
-            await Time.Delay(1780);
+	        direita(275,275);
+	        await Time.Delay(1892);
         }
         if(red("sensorM")){
-			dropar();
-			await dropar();
+		await droparvitima();
         }
         
     } else{
@@ -445,8 +444,8 @@ if(withvictmin){
 	distanciaD = ultra_D.Analog;
 	sensores_cor();
 	frente(200,200);
-            direita(200, 200);
-            await Time.Delay(1780);
+	        direita(275,275);
+	        await Time.Delay(1892);
         }
         if(verde_A()){
 			    await Time.Delay(10);
@@ -458,8 +457,7 @@ if(withvictmin){
 	distanciaD = ultra_D.Analog;
 	sensores_cor();
 	frente(200,200);	
-			dropar();
-			await dropar();
+			await droparvitima();
         }
     }
 
@@ -687,23 +685,25 @@ async Task pegarcubo(){
     destravarM();
     levantarM(300, 300); 
     await Time.Delay(1660); 
+	travarM();
     destravarB();
-    levantarB(-250,-250); 
+    levantarB(-200,-200); 
     await Time.Delay(800);
     destravar();
     frente(160, 160);
-    await Time.Delay(2160);
+    await Time.Delay(2060);
+	destravarM();
     travar();
     levantarM(-250, -250);
     await Time.Delay(2060);
 	travarM();
-    levantarB(200,200);
+    levantarB(170,170);
     await Time.Delay(1900);
 	destravarM();
     levantarM(250, 250);
-    await Time.Delay(960);
+    await Time.Delay(1160);
     levantarM(-250, -250);
-    await Time.Delay(960);
+    await Time.Delay(1160);
     travarM();
     destravar();
 }
@@ -716,7 +716,7 @@ async Task dropar(){
 	        frente(130,130);
 	        await Time.Delay(1450);
 	        direita(275,275);
-	        await Time.Delay(1822);
+	        await Time.Delay(1892);
 	        frente(-300,-300);
 	        await Time.Delay(2050);
 	        frente(160,160);
@@ -724,9 +724,9 @@ async Task dropar(){
 	        travar();
 	        destravarG();
 	        await Time.Delay(100);
-	        levantarG(320,320);
+	        levantarG(350,350);
 	        await Time.Delay(1100);
-	        levantarG(-320,-320);
+	        levantarG(-350,-350);
 	        await Time.Delay(400);
 	        travarG();
 	        destravar();
@@ -764,13 +764,13 @@ async Task desvio(){
 
 async Task pegarvitima(){
  frente(-200, -200);
-    await Time.Delay(1100);
+    await Time.Delay(1000);
     travar();
     destravarM();
     levantarM(400, 400); 
     await Time.Delay(1660); 
     destravarB();
-    levantarB(-250,-250); 
+    levantarB(-220,-220); 
     await Time.Delay(800);
     destravar();
     direita(200, 200);
@@ -781,7 +781,7 @@ async Task pegarvitima(){
     levantarM(-250, -250);
     await Time.Delay(1860);
 	travarM();
-    levantarB(230,230);
+    levantarB(220,220);
     await Time.Delay(2100);
 	destravarM();
     levantarM(250, 250);
@@ -790,4 +790,34 @@ async Task pegarvitima(){
     await Time.Delay(960);
     travarM();
     destravar();
+}
+
+async Task droparvitima(){
+            destravar();
+	        destravarB();
+	        levantarB(-300,-300);
+	        await Time.Delay(300);
+	        frente(130,130);
+	        await Time.Delay(1450);
+	        direita(275,275);
+	        await Time.Delay(1822);
+	        frente(-300,-300);
+	        await Time.Delay(2050);
+	        frente(160,160);
+	        await Time.Delay(3850);
+	        travar();
+	        destravarG();
+	        await Time.Delay(100);
+	        levantarG(270,270);
+	        await Time.Delay(1100);
+	        levantarG(-270,-270);
+	        await Time.Delay(400);
+	        travarG();
+	        destravar();
+	        frente(110,110);
+	        await Time.Delay(300);
+	        destravarB();
+	        levantarB(300,300);
+	        await Time.Delay(300);
+            withvictmin = false;
 }
