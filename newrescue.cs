@@ -1,9 +1,10 @@
 string motor1 = "motor1", motor2 = "motor2", motor3 = "motor3", motor4="motor4",garra = "garra", braço = "braço",
-mão = "mão", cor_M, cor_L2, cor_R2, cor_R, cor_L, cor_B, cor_B2, bagColorL, bagColorR, distanciafrente, distanciadireita, distanciagarra;
+mão = "mão", cor_M, cor_L2, cor_R2, cor_R, cor_L, cor_B, cor_B2, bagColorL, bagColorR, distanciafrente, distanciadireita, distanciagarra, distanciaesquerda;
 bool toque1, toque2, toque3 = false;
 
 bool resgate = false;
 bool percurso = true;
+bool final = false;
 bool withvictmin = false;
 bool leftcube = false;
 
@@ -36,6 +37,7 @@ UltrasonicSensor Ultra_B = Bot.GetComponent<UltrasonicSensor>("ultraBack");
 UltrasonicSensor ultra_F = Bot.GetComponent<UltrasonicSensor>("ultra_F");
 UltrasonicSensor ultra_D = Bot.GetComponent<UltrasonicSensor>("ultra_D");
 UltrasonicSensor ultra_G = Bot.GetComponent<UltrasonicSensor>("ultra_G");
+UltrasonicSensor ultra_L = Bot.GetComponent<UltrasonicSensor>("ultra_L");
 /*UltrasonicSensor ultra_G2 = Bot.GetComponent<UltrasonicSensor>("ultra_G2");
 UltrasonicSensor ultra_G3 = Bot.GetComponent<UltrasonicSensor>("ultra_G3");*/
 
@@ -48,27 +50,9 @@ double distanciaD = ultra_D.Analog;
 distanciagarra = Bot.GetComponent<UltrasonicSensor>("ultra_G").Analog.ToString();
 double distanciaG = ultra_G.Analog;
 
+distanciaesquerda = Bot.GetComponent<UltrasonicSensor>("ultra_L").Analog.ToString();
+double distanciaL = ultra_L.Analog;
 
-Color cor_VR = Bot.GetComponent<ColorSensor>("sensorR").Analog;
-double redR = cor_VR.Red; 
-double greenR = cor_VR.Green; 
-double blueR = cor_VR.Blue; 
-Color cor_VR2 = Bot.GetComponent<ColorSensor>("sensorR2").Analog;
-double redR2 = cor_VR2.Red; 
-double greenR2 = cor_VR2.Green; 
-double blueR2 = cor_VR2.Blue; 
-Color cor_VL = Bot.GetComponent<ColorSensor>("sensorL").Analog;
-double redL = cor_VL.Red; 
-double greenL = cor_VL.Green; 
-double blueL = cor_VL.Blue; 
-Color cor_VL2 = Bot.GetComponent<ColorSensor>("sensorL2").Analog;
-double redL2 = cor_VL2.Red; 
-double greenL2 = cor_VL2.Green; 
-double blueL2 = cor_VL2.Blue; 
-Color cor_VM = Bot.GetComponent<ColorSensor>("sensorM").Analog;
-double redM = cor_VM.Red; 
-double greenM = cor_VM.Green; 
-double blueM = cor_VM.Blue; 
 
 IO.PrintLine ("distancia:" + distanciafrente);
 while(percurso == true){
@@ -293,6 +277,19 @@ distanciagarra = Bot.GetComponent<UltrasonicSensor>("ultra_G").Analog.ToString()
 distancia = ultra_F.Analog;
 distanciaG = ultra_G.Analog;
 distanciaD = ultra_D.Analog;
+if (distanciaL >= 60){
+esquerda(275,275);
+await Time.Delay(1892);
+frente(100,100);
+if (prata(cor_M)){
+direita(275,275);
+await Time.Delay(1892);
+}
+if(cor_M == "Preto"){
+final = true;
+}
+
+}
 if(distancia < 3 && distancia > 0){
 destravar();
 	        direita(275,275);
@@ -373,7 +370,6 @@ if(distanciaG < 2 && distanciaG > 0  && withvictmin == false){
 	        await Time.Delay(1892);
     }
 }
-
 }
 
 }
@@ -464,8 +460,171 @@ while(withvictmin){
 
     
 }
+	while(final == true){
+		distanciafrente = Bot.GetComponent<UltrasonicSensor>("ultra_F").Analog.ToString();
+distanciadireita = Bot.GetComponent<UltrasonicSensor>("ultra_D").Analog.ToString();
+distanciagarra = Bot.GetComponent<UltrasonicSensor>("ultra_G").Analog.ToString();
+distancia = ultra_F.Analog;
+distanciaG = ultra_G.Analog;
+sensores_cor();
+
+
+await Time.Delay(50);
+if( red("sensorM")) {
+travar();
+
+}
+
+	if(distancia < 2 && distancia >= 0 && cor_M == "Preto"){
+		await desvio();
+}
+
+if(distancia == -1 ){
+distancia = 300;
+}
+IO.PrintLine ("Percurso");
+IO.PrintLine ("distancia:" + distancia.ToString());
+destravar();
+sensores_cor();
+travarG();
+
+if(verde_A()){
+frente(100,100);
+await Time.Delay(150);
+cor_verde();
+	if (verde_R() && verde_L()){
+	destravar();
+	frente(110,110);
+	await Time.Delay(150);
+	direita(300,300);
+	await Time.Delay(3624);
+	frente(110,110);
+	await Time.Delay(300);
+	continue;
+}
+	if (verde_L()){
+	destravar();
+	frente(110,110);
+	await Time.Delay(750);
+	esquerda(300,300);
+	await Time.Delay(1622);
+	frente(110,110);
+	await Time.Delay(300);
+	continue;
+}
+
+	if (verde_R()){
+	destravar();
+	frente(110,110);
+	await Time.Delay(750);
+	direita(300,300);
+	await Time.Delay(1622);
+	frente(110,110);
+	await Time.Delay(300);
+	continue;
+}	
+
+}
+
+	if (cor_L == "Preto" && cor_M == "Branco" && cor_R == "Branco"){
+	destravar();
+	esquerda(140,140);
+	await Time.Delay(200);
+	continue;
+
+} 
+
+	if (cor_L2 == "Preto" && cor_M == "Branco" && cor_R == "Branco"){
+	destravar();
+	esquerda(140,140);
+	await Time.Delay(200);
+	continue;
+
+}
+
+	if (cor_L == "Branco" && cor_M == "Branco" && cor_R == "Preto"){
+	destravar();
+	direita(140,140);
+	await Time.Delay(60);
+	continue;
+
+}
+
+	if (cor_L == "Branco" && cor_M == "Branco" && cor_R2 == "Preto"){
+	destravar();
+	direita(140,140);
+	await Time.Delay(60);
+	continue;
+
+}
+
+	if (cor_L == "Branco" && cor_M == "Preto" && cor_R == "Preto" && cor_R2 == "Preto"){
+	destravar();
+	frente(110,110);
+	await Time.Delay(450);
+	sensores_cor();
+	cor_verde();
+if(cor_L == "Preto" || cor_L2 == "Preto" || cor_M == "Preto" || cor_R == "Preto" || cor_R2 == "Preto"){
+frente(110, 110);
+await Time.Delay(450);
+cor_verde();
+if(verde_R() && verde_L()){
+frente(100, 100);
+await Time.Delay(1000);
 }
 }
+else {
+	frente(-100,-100);
+	await Time.Delay(100);
+	direita(300,300);
+	await Time.Delay(1622);
+	frente(-200,-200);
+	await Time.Delay(200);
+	continue;
+}
+	continue;
+}
+
+	if (cor_L == "Preto" && cor_L2 == "Preto" && cor_M == "Preto" && cor_R == "Branco"){
+	destravar();
+	frente(110,110);
+	await Time.Delay(450);
+	sensores_cor();
+	cor_verde();
+if(cor_L == "Preto" || cor_L2 == "Preto" || cor_M == "Preto" || cor_R == "Preto" || cor_R2 == "Preto"){
+frente(110, 110);
+await Time.Delay(450);
+cor_verde();
+if(verde_R() && verde_L()){
+frente(100, 100);
+await Time.Delay(1000);
+}
+}
+else {
+	frente(-100,-100);
+	await Time.Delay(100);
+	esquerda(300,300);
+	await Time.Delay(1622);
+	frente(-200,-200);
+	await Time.Delay(200);
+	continue;
+}
+	continue;
+}
+
+if (cor_L == "Preto" && cor_M == "Preto" && cor_R == "Preto"){
+	frente(150, 150);
+	await Time.Delay(600);
+}	
+
+else {
+frente(155,155);
+}
+
+}
+	}
+}
+
 
 
 
