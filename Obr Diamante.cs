@@ -10,7 +10,7 @@
     Servomotor motor4 = Bot.GetComponent<Servomotor>("motor4");
     Servomotor braço  = Bot.GetComponent<Servomotor>("braço");
     Servomotor mão = Bot.GetComponent<Servomotor>("mão");
-   // Servomotor garra = Bot.GetComponent<Servomotor>("garra");
+    Servomotor garra = Bot.GetComponent<Servomotor>("garra");
 
 //Declaração dos sensores de cor
     ColorSensor sensorM = Bot.GetComponent<ColorSensor>("sensorM");
@@ -52,7 +52,14 @@
     UltrasonicSensor ultra_F = Bot.GetComponent<UltrasonicSensor>("ultra_F");
     UltrasonicSensor ultra_E = Bot.GetComponent<UltrasonicSensor>("ultra_E"); 
     UltrasonicSensor ultra_G = Bot.GetComponent<UltrasonicSensor>("ultra_G");
-    UltrasonicSensor ultra_T = Bot.GetComponent<UltrasonicSensor>("ultra_T");   
+    UltrasonicSensor ultra_T = Bot.GetComponent<UltrasonicSensor>("ultra_T");  
+
+// Variáveis do sensor Ultrassonico
+    double distanceF;
+    double distanceD;
+    double distanceE;
+    double distanceG;
+    double distanceT;
 
 // Constantes do PID
     const double Kp = 90;
@@ -65,18 +72,24 @@
 
 // Começo da execução do Codigo
     async Task Main (){
+        await GUP();
         while(true){
             await Time.Delay(50);
+            ReadDistance();
             LineFollower();
-//Casos do verde (incompleto)
-    if (verde_R()){
-        error = 4.5
+    //Casos do verde
+            if (verde_R()){
+                await R90();
+            }
+            if (verde_L()){
+                await L90();
+            }
+    //Casos do obstaculo
+            if (distanceF <= 2){
+            await obstaculo();
+        }          
     }
-    if (verde_L()){
-        error = -4.5
     }
-}        
-}
 
 
 //Funções dos motores
@@ -92,32 +105,32 @@
     void frente (double força, double velocidade) {
         destravar();
         motor1.Apply(força, velocidade);
-        motor2.Apply(força, velocidade);
         motor3.Apply(força, velocidade);
+        motor2.Apply(força, velocidade);
         motor4.Apply(força, velocidade);
     }
 
     void tras (double força, double velocidade){
         destravar();
         motor1.Apply(força, -velocidade);
-        motor2.Apply(força, -velocidade);
         motor3.Apply(força, -velocidade);
+        motor2.Apply(força, -velocidade);
         motor4.Apply(força, -velocidade);
     }
 
     void direita (double força, double velocidade){
         destravar();
         motor1.Apply(força, velocidade);
-        motor2.Apply(força, velocidade);
-        motor3.Apply(força, -velocidade);
+        motor3.Apply(força, velocidade);
+        motor2.Apply(força, -velocidade);
         motor4.Apply(força, -velocidade);
     }
 
     void esquerda (double força, double velocidade){
         destravar();
         motor1.Apply(força, -velocidade);
-        motor2.Apply(força, -velocidade);
-        motor3.Apply(força, velocidade);
+        motor3.Apply(força, -velocidade);
+        motor2.Apply(força, velocidade);
         motor4.Apply(força, velocidade);
     }
 
@@ -126,6 +139,15 @@
 	    motor2.Locked = true;
 	    motor3.Locked = true;
 	    motor4.Locked = true;
+    }
+
+//Leitura dos sensores ultrassonicos  
+    void ReadDistance(){
+        distanceF = ultra_F.Analog;
+        distanceE = ultra_E.Analog;
+        distanceD = ultra_D.Analog;
+        distanceT = ultra_T.Analog;
+        distanceG = ultra_G.Analog;
     }
 
 //Leitura dos Sensores de cor (Branco && Preto)
@@ -139,7 +161,7 @@
     string line = $"{corL2} {corL} {corM} {corR} {corR2}";
         line = line.Replace("False", "0");
         line = line.Replace("True", "1");
-    return line;
+          return line;
     }
 
 //Leitura dos Sensores de cor (Verde && Prata && Vermleho)
@@ -283,4 +305,56 @@
         motor3.Apply(500, 150+P);
         motor2.Apply(500, 150-P);
         motor4.Apply(500, 150-P);
+    }
+
+//Função de girar 90 Graus no verde
+    async Task R90(){
+        frente(200,200);
+        await Time.Delay(700);
+        direita(500, 500);
+        await Time.Delay(1100);
+        frente(200,200);
+        await Time.Delay(700);
+    }
+
+    async Task L90(){
+        frente(200,200);
+        await Time.Delay(700);
+        esquerda(500, 500);
+        await Time.Delay(1100);
+        frente(200,200);
+        await Time.Delay(700);
+    }
+//Função de subir a garra
+    async Task GUP(){
+        braço.Locked = false;
+        braço.Apply(força, velocidade);
+        await Time.Delay(1000);
+    }
+
+//Função desviar de obstaculo
+    async Task obstaculo(){
+        direita(500,500);
+        await Time.Delay(1100);
+        frente(200,200);
+    if(distanceE > 20){
+        frente(200,200);
+        await Time.Delay(500);
+        esquerda(500,500);
+        await Time.Delay(1100);
+        frente(200,200);
+    }
+    }
+    /*if(linhaM){
+        break;
+    }
+    }*/
+
+    bool linhaM(){
+        if(ReadLine()=="0 0 1 0 0"){
+        return true;
+    }
+        else{
+        return false;
+        }
     }
