@@ -10,25 +10,30 @@
     Servomotor motor4 = Bot.GetComponent<Servomotor>("motor4");
     Servomotor braço  = Bot.GetComponent<Servomotor>("braço");
     Servomotor mão = Bot.GetComponent<Servomotor>("mão");
-    Servomotor garra = Bot.GetComponent<Servomotor>("garra");
+   // Servomotor garra = Bot.GetComponent<Servomotor>("garra");
 
-// Sensores de cor
+//Declaração dos sensores de cor
     ColorSensor sensorM = Bot.GetComponent<ColorSensor>("sensorM");
     ColorSensor sensorL = Bot.GetComponent<ColorSensor>("sensorL");
     ColorSensor sensorL2 = Bot.GetComponent<ColorSensor>("sensorL2");
     ColorSensor sensorR = Bot.GetComponent<ColorSensor>("sensorR");
-    ColorSensor sensorR2 = Bot.GetComponent<ColorSensor>("sensorR2)");
+    ColorSensor sensorR2 = Bot.GetComponent<ColorSensor>("sensorR2");
     ColorSensor sensorB = Bot.GetComponent<ColorSensor>("sensorB");
     ColorSensor sensorB2 = Bot.GetComponent<ColorSensor>("sensorB2");
-    bool cor_B;
-    bool cor_B2;
+
+// Variáveis de cor Digitais
     bool corL;
     bool corL2;
     bool corM;
     bool corR;
     bool corR2;
-    bool bagColorL;
-    bool bagColorR;
+
+// Variáveis de cor Analogicas
+    string colorM;
+    string colorL;
+    string colorL2;
+    string colorR;
+    string colorR2;
 
 // Sensores de toque
     TouchSensor toque_E = Bot.GetComponent<TouchSensor>("toque_E"); 
@@ -59,19 +64,24 @@
     int força = 125;
 
 // Começo da execução do Codigo
-async Task Main (){
-    while(true){
-        frente(100,100);
-        IO.PrintLine("cor_L");
-        IO.PrintLine("cor_L2");
-        IO.PrintLine("cor_M");
-        IO.PrintLine("cor_R");
-        IO.PrintLine("cor_R2");
-
+    async Task Main (){
+        while(true){
+            await Time.Delay(50);
+            LineFollower();
+//Casos do verde (incompleto)
+    if (verde_R()){
+        error = 4.5
+    }
+    if (verde_L()){
+        error = -4.5
+    }
 }        
 }
 
+
 //Funções dos motores
+//Motores 1 && 3 = Motores da esquerda
+//Motores 2 && 4 = Motores da direita   
     void destravar(){
 	    motor1.Locked = false;
 	    motor2.Locked = false;
@@ -125,10 +135,14 @@ async Task Main (){
 	    corL2 = !sensorL2.Digital;
 	    corR = !sensorR.Digital;
 	    corR2 = !sensorR2.Digital;
+//Organização da ordem dos sensores de acordo com sua posição no robô
+    string line = $"{corL2} {corL} {corM} {corR} {corR2}";
+        line = line.Replace("False", "0");
+        line = line.Replace("True", "1");
+    return line;
     }
 
 //Leitura dos Sensores de cor (Verde && Prata && Vermleho)
-
 //Verde
     bool isgreen(string sensor){
         Color cor = Bot.GetComponent<ColorSensor>(sensor).Analog;
@@ -205,4 +219,68 @@ async Task Main (){
         }
     }
 
+    async Task Cases()
+//Enquanto a linha estiver na direita o erro sera positivo
+//Enquanto a linha estiver na esquerda o erro sera negativo
+    {
+        switch (ReadLine())
+        {
+            case "0 0 0 0 0":
+                error = 0;
+                break;
+            case "1 1 1 1 1":
+                error = 0;
+                break;
+            case "0 0 1 0 0":
+                error = 0;
+                break;
+            case "0 0 1 1 0":
+                error = 1;
+                break;
+            case "0 0 0 1 0":
+                error = 2;
+                break;
+            case "0 0 0 1 1":
+                error = 3;
+                break;
+            case "0 0 0 0 1":
+                error = 4;
+                break;
+            case "0 1 1 0 0":
+                error = -1;
+                break;
+            case "0 1 0 0 0":
+                error = -2;
+                break;
+            case "1 1 0 0 0":
+                error = -3;
+                break;
+            case "1 0 0 0 0":
+                error = -4;
+                break;
+            case "1 1 1 1 0":
+                error = -4;
+                break;
+            case "0 1 1 1 1":
+                error = 4;
+                break; 
+//Casos de 90º
+            case "1 1 1 0 0": 
+                error = -4.5;
+                break;
+            case "0 0 1 1 1":
+                error = 4.5;
+                break;
+        }
+    }
 
+//Seguidor de linha baseado no PID(Erros)
+    void LineFollower(){
+        Cases();
+        P = Kp*error;
+        destravar();
+        motor1.Apply(500, 150+P);
+        motor3.Apply(500, 150+P);
+        motor2.Apply(500, 150-P);
+        motor4.Apply(500, 150-P);
+    }
