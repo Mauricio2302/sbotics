@@ -1,7 +1,33 @@
 //OBR DIAMANTE :)
 //By: Maurício Calvet ;-;
 
-//Declaração de Variáveis
+//Declaração de Variáveis   
+
+//Sensores internos do robô
+    string bussola(){
+        double bussola;
+        bussola = Bot.Compass;
+        string printbussola = $"{bussola}";
+        return printbussola;
+    }
+
+    double bussolaValues(){
+        return Bot.Compass;
+    }
+    
+    string Inclination(){
+        double inclination;
+        inclination = Bot.Inclination;
+        string printinclination = $"{inclination}";
+        return printinclination;
+    }
+
+    double InclinationValues(){
+        return Bot.Inclination;
+    }    
+//Bussola <90 ta inclinado pra esquerda
+//Bussola >90 ta inclinado pra direita
+//Inclinação <350 ta inclinado pra cima
 
 // Servo Motores
     Servomotor motor1 = Bot.GetComponent<Servomotor>("motor1");
@@ -65,31 +91,38 @@
     const double Kp = 90;
     double P;
     double error = 0;
-    byte rescueSpeed = 250;
-    const int rootDelay = 50;
+
+// Valores base para Velocidade e Força
     int velocidade = 125;
     int força = 125;
 
 // Começo da execução do Codigo
     async Task Main (){
         await GUP();
+        double valor_inicial = bussolaValues();
         while(true){
             await Time.Delay(50);
-            ReadDistance();
+            IO.Print(bussolaValues().ToString());
+            IO.Print(InclinationValues().ToString());
+            /*ReadDistance();
             LineFollower();
-    //Casos do verde
+        //Casos do verde
             if (verde_R()){
                 await R90();
             }
+
             if (verde_L()){
                 await L90();
+                continue;
             }
-    //Casos do obstaculo
-            if (distanceF <= 2){
+            }
+        //Casos do obstaculo
+     /*       if (distanceF <= 2){
             await obstaculo();
-        }          
+        }*/          
     }
     }
+    
 
 
 //Funções dos motores
@@ -263,7 +296,7 @@
                 error = 2;
                 break;
             case "0 0 0 1 1":
-                error = 3;
+                error = 4.5;
                 break;
             case "0 0 0 0 1":
                 error = 4;
@@ -275,7 +308,7 @@
                 error = -2;
                 break;
             case "1 1 0 0 0":
-                error = -3;
+                error = -4.5;
                 break;
             case "1 0 0 0 0":
                 error = -4;
@@ -301,10 +334,10 @@
         Cases();
         P = Kp*error;
         destravar();
-        motor1.Apply(500, 150+P);
-        motor3.Apply(500, 150+P);
-        motor2.Apply(500, 150-P);
-        motor4.Apply(500, 150-P);
+        motor1.Apply(500, 160+P);
+        motor3.Apply(500, 160+P);
+        motor2.Apply(500, 160-P);
+        motor4.Apply(500, 160-P);
     }
 
 //Função de girar 90 Graus no verde
@@ -328,8 +361,8 @@
 //Função de subir a garra
     async Task GUP(){
         braço.Locked = false;
-        braço.Apply(força, velocidade);
-        await Time.Delay(1000);
+        braço.Apply(500, 300);
+        await Time.Delay(3000);
     }
 
 //Função desviar de obstaculo
@@ -349,7 +382,7 @@
         break;
     }
     }*/
-
+//Caso onde a linha preta se encontra no meio
     bool linhaM(){
         if(ReadLine()=="0 0 1 0 0"){
         return true;
@@ -357,4 +390,91 @@
         else{
         return false;
         }
+    }
+
+//Caso onde todos os sensores veem a linha preta
+    bool full_line(){
+        if(ReadLine()=="1 1 1 1 1"){
+        return true;
+    }
+        else{
+        return false;
+        }
+    }
+
+//Caso onde a linha preta se encontra nos sensores da esquerda e no meio
+    bool linhaE90(){
+        if(ReadLine()=="1 1 1 0 0"){
+        return true;
+    }
+        else{
+        return false;
+        }
+    }
+
+//Caso onde a linha preta se encontra nos sensores da direita e no meio
+    bool linhaD90(){
+        if(ReadLine()=="0 0 1 1 1"){
+        return true;
+    }
+        else{
+        return false;
+        }
+    }
+//
+    bool linhaD(){
+        if(ReadLine()=="0 0 0 1 1" || ReadLine()=="0 0 0 0 1"){
+        return true;
+    }
+        else{
+        return false;
+        }
+    }
+
+//
+    bool linhaE(){
+        if(ReadLine()=="1 1 0 0 0" || ReadLine()=="1 0 0 0 0"){
+        return true;
+    }
+        else{
+        return false;
+        }
+    }
+
+    string posição(){
+        if (valor_inicial > 89 && <91) {
+            N = 90
+            NO = < 90 && > 0
+            SO = <360 && > 270
+            S = 270
+            SE = <270 && > 180
+            NE = <180 && > 90
+        } 
+
+        if (valor_inicial > 0 && < 2) {
+            N = 0
+            NO = < 360 && > 270
+            SO = <270 && > 180
+            S = 180
+            SE = <180 && > 90
+            NE = <90 && > 0
+        } 
+
+        if (valor_inicial > 179 && <181) {
+            N = 180
+            NO = <180 && > 90
+            SO = <90 && > 0
+            S = 0
+            SE = <360 && > 270
+            NE = < 270 && > 180
+        }
+        if (valor_inicial > 359 && <361) {
+            N = 360
+            NO = <360 && > 270
+            SO = <90 && > 0
+            S = 0
+            SE = <360 && > 270
+            NE = < 270 && > 180
+        }
+         
     }
