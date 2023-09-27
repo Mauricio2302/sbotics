@@ -24,7 +24,11 @@
 
     double InclinationValues(){
         return Bot.Inclination;
-    }    
+    }
+        double valor_direita = 0;
+        double valor_esquerda = 0;
+        double valor_inicial = 0;
+
 //Bussola <90 ta inclinado pra esquerda
 //Bussola >90 ta inclinado pra direita
 //Inclinação <350 ta inclinado pra cima
@@ -99,12 +103,17 @@
 // Começo da execução do Codigo
     async Task Main (){
         await GUP();
-        double valor_inicial = bussolaValues();
+        valor_inicial = bussolaValues();
+        valor_direita = valor_inicial + 90;
+        valor_esquerda = valor_inicial - 90;
         while(true){
             await Time.Delay(50);
-            IO.Print(bussolaValues().ToString());
-            IO.Print(InclinationValues().ToString());
-            /*ReadDistance();
+
+            IO.PrintLine(valor_inicial.ToString());
+            IO.PrintLine(valor_esquerda.ToString());
+            IO.PrintLine(valor_direita.ToString());
+            //IO.Print(InclinationValues().ToString());
+            ReadDistance();
             LineFollower();
         //Casos do verde
             if (verde_R()){
@@ -115,13 +124,14 @@
                 await L90();
                 continue;
             }
-            }
+            
         //Casos do obstaculo
-     /*       if (distanceF <= 2){
+            if (distanceF <= 3  && distanceF >=0){
             await obstaculo();
-        }*/          
+        }         
     }
     }
+    
     
 
 
@@ -366,25 +376,47 @@
     }
 
 //Função desviar de obstaculo
-    async Task obstaculo(){
+    async Task obstaculo(){ 
         direita(500,500);
-        await Time.Delay(1100);
-        frente(200,200);
-    if(distanceE > 20){
-        frente(200,200);
-        await Time.Delay(500);
-        esquerda(500,500);
-        await Time.Delay(1100);
-        frente(200,200);
+        await Time.Delay(950);
+            while(nolinha()){
+                await Time.Delay(50);
+            if(distanceE == -1){
+            while(bussolaValues() >= valor_esquerda && bussolaValues() <= valor_inicial){
+                await Time.Delay(50);
+                esquerda(500, 300);
+        } 
+        }
+            }
+            if(full_line()){
+            while(bussolaValues() <= valor_direita && bussolaValues() >= valor_inicial){
+                await Time.Delay(50);
+                direita(500, 300);
+            if(linhaM()){
+                break;
+        } 
+        
+            else{
+                frente(200,200);
+        }
+        }
+        }
     }
-    }
-    /*if(linhaM){
-        break;
-    }
-    }*/
+    
+    
 //Caso onde a linha preta se encontra no meio
     bool linhaM(){
         if(ReadLine()=="0 0 1 0 0"){
+        return true;
+    }
+        else{
+        return false;
+        }
+    }
+
+//Caso onde não tem linha preta    
+        bool nolinha(){
+        if(ReadLine()=="0 0 0 0 0"){
         return true;
     }
         else{
@@ -441,40 +473,30 @@
         }
     }
 
-    string posição(){
-        if (valor_inicial > 89 && <91) {
-            N = 90
-            NO = < 90 && > 0
-            SO = <360 && > 270
-            S = 270
-            SE = <270 && > 180
-            NE = <180 && > 90
+    void posição(){
+        if (valor_inicial > 0 && valor_inicial < 2) {
+             valor_inicial = 0;
+             valor_direita = 90;
+             valor_esquerda = 270;
         } 
-
-        if (valor_inicial > 0 && < 2) {
-            N = 0
-            NO = < 360 && > 270
-            SO = <270 && > 180
-            S = 180
-            SE = <180 && > 90
-            NE = <90 && > 0
+        if (valor_inicial > 89 && valor_inicial <91) {
+             valor_inicial = 90;
+             valor_direita = 180;
+             valor_esquerda = 0;
         } 
-
-        if (valor_inicial > 179 && <181) {
-            N = 180
-            NO = <180 && > 90
-            SO = <90 && > 0
-            S = 0
-            SE = <360 && > 270
-            NE = < 270 && > 180
+        if (valor_inicial > 179 && valor_inicial <181) {
+             valor_inicial = 180;
+             valor_direita = 270;
+             valor_esquerda = 90;
         }
-        if (valor_inicial > 359 && <361) {
-            N = 360
-            NO = <360 && > 270
-            SO = <90 && > 0
-            S = 0
-            SE = <360 && > 270
-            NE = < 270 && > 180
+        if (valor_inicial > 269 && valor_inicial <271) {
+             valor_inicial = 270;
+             valor_direita = 360;
+             valor_esquerda = 180;
         }
-         
+        if (valor_inicial > 359 && valor_inicial <361) {
+            valor_inicial = 360;
+            valor_direita = 90;
+            valor_esquerda = 270;
+        } 
     }
