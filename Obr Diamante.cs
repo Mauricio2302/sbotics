@@ -1,9 +1,9 @@
 //OBR DIAMANTE :)
 //By: Maurício Calvet ;-;
 
-//Declaração de Variáveis   
+//Declaração de Variáveis Globais
 
-//Sensores internos do robô
+//Sensores internos do robô (Bussola e Inclinação)
     string bussola(){
         double bussola;
         bussola = Bot.Compass;
@@ -104,15 +104,9 @@
     async Task Main (){
         await GUP();
         valor_inicial = bussolaValues();
-        valor_direita = valor_inicial + 90;
-        valor_esquerda = valor_inicial - 90;
+        posição();
         while(true){
             await Time.Delay(50);
-
-            IO.PrintLine(valor_inicial.ToString());
-            IO.PrintLine(valor_esquerda.ToString());
-            IO.PrintLine(valor_direita.ToString());
-            //IO.Print(InclinationValues().ToString());
             ReadDistance();
             LineFollower();
         //Casos do verde
@@ -126,11 +120,11 @@
             }
             
         //Casos do obstaculo
-            if (distanceF <= 3  && distanceF >=0){
+            if (distanceF <= 1.5  && distanceF >=0){
             await obstaculo();
-        }         
-    }
-    }
+            }         
+            }
+            }
     
     
 
@@ -138,6 +132,8 @@
 //Funções dos motores
 //Motores 1 && 3 = Motores da esquerda
 //Motores 2 && 4 = Motores da direita   
+
+//Função para destravar os motores para liberar a locomoção
     void destravar(){
 	    motor1.Locked = false;
 	    motor2.Locked = false;
@@ -145,6 +141,7 @@
 	    motor4.Locked = false;
     }
 
+//Função para mover os 4 motores para frente
     void frente (double força, double velocidade) {
         destravar();
         motor1.Apply(força, velocidade);
@@ -153,6 +150,7 @@
         motor4.Apply(força, velocidade);
     }
 
+//Função para mover os 4 motores para trás
     void tras (double força, double velocidade){
         destravar();
         motor1.Apply(força, -velocidade);
@@ -161,6 +159,7 @@
         motor4.Apply(força, -velocidade);
     }
 
+//Função para mover os 4 motores de forma que faça ele se mover para a direita
     void direita (double força, double velocidade){
         destravar();
         motor1.Apply(força, velocidade);
@@ -169,6 +168,7 @@
         motor4.Apply(força, -velocidade);
     }
 
+//Função para mover os 4 motores de forma que faça ele se mover para a esquerda
     void esquerda (double força, double velocidade){
         destravar();
         motor1.Apply(força, -velocidade);
@@ -177,6 +177,7 @@
         motor4.Apply(força, velocidade);
     }
 
+//Função para travar os motores e bloquear a locomoção
     void travar(){
 	    motor1.Locked = true;
 	    motor2.Locked = true;
@@ -191,6 +192,15 @@
         distanceD = ultra_D.Analog;
         distanceT = ultra_T.Analog;
         distanceG = ultra_G.Analog;
+        if(distanceF == -1){
+            distanceF = 999;
+        }
+        if(distanceE == -1){
+            distanceE = 999;
+        }
+        if(distanceD == -1){
+            distanceD = 999;
+        }
     }
 
 //Leitura dos Sensores de cor (Branco && Preto)
@@ -284,10 +294,9 @@
         }
     }
 
-    async Task Cases()
+    async Task Cases(){
 //Enquanto a linha estiver na direita o erro sera positivo
 //Enquanto a linha estiver na esquerda o erro sera negativo
-    {
         switch (ReadLine())
         {
             case "0 0 0 0 0":
@@ -350,7 +359,9 @@
         motor4.Apply(500, 160-P);
     }
 
-//Função de girar 90 Graus no verde
+//Funções de girar 90 Graus no verde
+
+//90º graus para a direita
     async Task R90(){
         frente(200,200);
         await Time.Delay(700);
@@ -360,6 +371,7 @@
         await Time.Delay(700);
     }
 
+//90º graus para a esquerda
     async Task L90(){
         frente(200,200);
         await Time.Delay(700);
@@ -368,6 +380,7 @@
         frente(200,200);
         await Time.Delay(700);
     }
+
 //Função de subir a garra
     async Task GUP(){
         braço.Locked = false;
@@ -375,34 +388,30 @@
         await Time.Delay(3000);
     }
 
-//Função desviar de obstaculo
-    async Task obstaculo(){ 
-        direita(500,500);
-        await Time.Delay(950);
-            while(nolinha()){
+//Função para o desvio de obstaculo
+    async Task obstaculo(){
+        ReadDistance();
+        if(bussolaValues() <= valor_direita){
+            while(bussolaValues() <= valor_direita){
+                ReadDistance();
                 await Time.Delay(50);
-            if(distanceE == -1){
-            while(bussolaValues() >= valor_esquerda && bussolaValues() <= valor_inicial){
-                await Time.Delay(50);
-                esquerda(500, 300);
-        } 
-        }
+                direita(200,200);
             }
-            if(full_line()){
-            while(bussolaValues() <= valor_direita && bussolaValues() >= valor_inicial){
-                await Time.Delay(50);
-                direita(500, 300);
-            if(linhaM()){
-                break;
-        } 
-        
-            else{
-                frente(200,200);
         }
-        }
+        frente(300,300);
+        await Time.Delay(1000);
+        ReadDistance();
+        IO.Print(distanceE.ToString());
+        if(distanceE >= 10){
+            if(bussolaValues() >= valor_inicial){
+                IO.Print("socorro");
+                while(bussolaValues() >= valor_inicial){
+                    await Time.Delay(50);
+                    esquerda(200,200);
+                }
+            }
         }
     }
-    
     
 //Caso onde a linha preta se encontra no meio
     bool linhaM(){
@@ -453,7 +462,8 @@
         return false;
         }
     }
-//
+
+//Caso onde a linha preta se encontra nos sensores da direita
     bool linhaD(){
         if(ReadLine()=="0 0 0 1 1" || ReadLine()=="0 0 0 0 1"){
         return true;
@@ -463,7 +473,7 @@
         }
     }
 
-//
+//Caso onde a linha preta se encontra nos sensores da esquerda
     bool linhaE(){
         if(ReadLine()=="1 1 0 0 0" || ReadLine()=="1 0 0 0 0"){
         return true;
@@ -473,30 +483,53 @@
         }
     }
 
+//Função para calcular as posições do robô baseado na bussola
     void posição(){
-        if (valor_inicial > 0 && valor_inicial < 2) {
+        if (valor_inicial >= 315 && valor_inicial <= 45) {
              valor_inicial = 0;
              valor_direita = 90;
              valor_esquerda = 270;
         } 
-        if (valor_inicial > 89 && valor_inicial <91) {
+        if (valor_inicial >= 45 && valor_inicial <= 135) {
              valor_inicial = 90;
              valor_direita = 180;
-             valor_esquerda = 0;
+             valor_esquerda = 1;
         } 
-        if (valor_inicial > 179 && valor_inicial <181) {
+        if (valor_inicial >= 135 && valor_inicial <=225) {
              valor_inicial = 180;
              valor_direita = 270;
              valor_esquerda = 90;
         }
-        if (valor_inicial > 269 && valor_inicial <271) {
+        if (valor_inicial >= 225 && valor_inicial <= 315) {
              valor_inicial = 270;
-             valor_direita = 360;
+             valor_direita = 353;
              valor_esquerda = 180;
         }
-        if (valor_inicial > 359 && valor_inicial <361) {
-            valor_inicial = 360;
-            valor_direita = 90;
-            valor_esquerda = 270;
-        } 
     }
+
+    /*
+            bool virei = false;
+        ReadDistance();
+    while(bussolaValues() <= valor_direita){
+        await Time.Delay(50);
+        direita(200,200);
+    if(bussolaValues() == valor_direita){
+        frente(200,200);
+        await Time.Delay(500);
+        continue;    
+    }
+    }
+    while(nolinha()){
+        await Time.Delay(50);
+        frente(100,100);
+    if(distanceE >= 15){
+    while(bussolaValues() >= valor_inicial){
+        await Time.Delay(50);
+        esquerda(200,200);
+    if(bussolaValues() == valor_inicial){
+        virei = true;
+    }
+    }     
+    }        
+    }
+    */
