@@ -28,6 +28,8 @@
         double valor_direita = 0;
         double valor_esquerda = 0;
         double valor_inicial = 0;
+        bool tortoD = false;
+        bool tortoE = false;
 
 //Bussola <90 ta inclinado pra esquerda
 //Bussola >90 ta inclinado pra direita
@@ -106,6 +108,7 @@
         valor_inicial = bussolaValues();
         posição();
         while(true){
+            //IO.PrintLine(Math.Truncate(bussolaValues()).ToString());
             await Time.Delay(50);
             ReadDistance();
             LineFollower();
@@ -120,11 +123,11 @@
             }
             
         //Casos do obstaculo
-            if (distanceF <= 1.5  && distanceF >=0){
-            await obstaculo();
+            if (distanceF <= 1  && distanceF >=0){
+                await obstaculo();
             }         
-            }
-            }
+        }
+    }
     
     
 
@@ -225,45 +228,45 @@
         double green = cor.Green; 
         double blue = cor.Blue; 
             if(green * 0.85 > red && green * 0.85 > blue){
-            return true;
-        }      
+                return true;
+            }      
             else {
-            return false;
-        }
+                return false;
+            }
     }
 //Localização do Verde
 
 // Verde na direita
     bool verde_R(){
         if(isgreen("sensorR") || isgreen("sensorR2")){
-         return true;
-     }
+            return true;
+        }
 
         else {
-        return false;
-     }
+            return false;
+        }
     }
 
 //Verde na esquerda
     bool verde_L(){
         if(isgreen("sensorL") || isgreen("sensorL2")){
-        return true;
-     }
+            return true;
+        }
 
         else {
-        return false;
-     }   
+            return false;
+        }   
     }
 
 //Verde em qualquer um dos Sensores
     bool verde_A(){
         if((isgreen("sensorR") || isgreen("sensorR2")) || (isgreen("sensorM")) || (isgreen("sensorL") || isgreen("sensorL2"))){
-        return true;
-     }
+            return true;
+        }
 
         else {
-        return false;
-     }
+            return false;
+        }
     }
 
 //Prata
@@ -272,10 +275,10 @@
         double red = cor.Red; 
         double green = cor.Green; 
         double blue = cor.Blue; 
-            if(blue * 0.98 > red && blue * 0.98 > green){
+        if(blue * 0.98 > red && blue * 0.98 > green){
             return true;
         }
-            else {
+        else {
         return false;
         }
     }
@@ -286,10 +289,10 @@
         double red = cor.Red; 
         double green = cor.Green; 
         double blue = cor.Blue; 
-            if(red > blue && red > green){
+        if(red > blue && red > green){
             return true;
         }
-            else {
+        else {
         return false;
         }
     }
@@ -353,10 +356,10 @@
         Cases();
         P = Kp*error;
         destravar();
-        motor1.Apply(500, 160+P);
-        motor3.Apply(500, 160+P);
-        motor2.Apply(500, 160-P);
-        motor4.Apply(500, 160-P);
+        motor1.Apply(500, 150+P);
+        motor3.Apply(500, 150+P);
+        motor2.Apply(500, 150-P);
+        motor4.Apply(500, 150-P);
     }
 
 //Funções de girar 90 Graus no verde
@@ -391,43 +394,76 @@
 //Função para o desvio de obstaculo
     async Task obstaculo(){
         ReadDistance();
-        if(bussolaValues() <= valor_direita){
-            while(bussolaValues() <= valor_direita){
+        bool virei = false;
+        bool virei2 = false;
+        bool cabei = false;
+        while(cabei == false){
+            await Time.Delay(50);
+            while(bussolaValues() <= valor_direita && virei == false){
                 ReadDistance();
                 await Time.Delay(50);
                 direita(200,200);
             }
-        }
-        frente(300,300);
-        await Time.Delay(1000);
-        ReadDistance();
-        IO.Print(distanceE.ToString());
-        if(distanceE >= 10){
-            if(bussolaValues() >= valor_inicial){
-                IO.Print("socorro");
+            virei = true;
+            ReadDistance();
+        if(distanceE <= 10 && virei == true && virei2 == false ){
+            IO.Print("socorro");
+            frente(200,200);
+            await Time.Delay(1600);
+            IO.PrintLine(valor_inicial.ToString());
+            IO.PrintLine(bussolaValues().ToString());
                 while(bussolaValues() >= valor_inicial){
                     await Time.Delay(50);
                     esquerda(200,200);
                 }
+        }
+            frente(200,200);
+            await Time.Delay(1800);
+            virei2 = true;
+        if(full_line()){
+            while(bussolaValues() <= valor_inicial){
+                await Time.Delay(50);
+                direita(200,200);
+            }
+            cabei = true;
+            break;
+        }
+        
+        if(distanceE <= 10 && virei == true && virei2 == true){
+            while(bussolaValues() >= valor_esquerda){
+                    await Time.Delay(50);
+                    esquerda(200,200);
             }
         }
-    }
+
+        if(full_line()){
+            while(bussolaValues() <= valor_inicial){
+                await Time.Delay(50);
+                direita(200,200);
+            }
+            cabei = true;
+            break;
+        }
+
+        }
+        }
+    
     
 //Caso onde a linha preta se encontra no meio
     bool linhaM(){
         if(ReadLine()=="0 0 1 0 0"){
         return true;
-    }
+        }
         else{
         return false;
         }
     }
 
 //Caso onde não tem linha preta    
-        bool nolinha(){
+    bool nolinha(){
         if(ReadLine()=="0 0 0 0 0"){
         return true;
-    }
+        }
         else{
         return false;
         }
@@ -437,7 +473,7 @@
     bool full_line(){
         if(ReadLine()=="1 1 1 1 1"){
         return true;
-    }
+        }
         else{
         return false;
         }
@@ -447,7 +483,7 @@
     bool linhaE90(){
         if(ReadLine()=="1 1 1 0 0"){
         return true;
-    }
+        }
         else{
         return false;
         }
@@ -457,7 +493,7 @@
     bool linhaD90(){
         if(ReadLine()=="0 0 1 1 1"){
         return true;
-    }
+        }
         else{
         return false;
         }
@@ -467,7 +503,7 @@
     bool linhaD(){
         if(ReadLine()=="0 0 0 1 1" || ReadLine()=="0 0 0 0 1"){
         return true;
-    }
+        }
         else{
         return false;
         }
@@ -477,7 +513,7 @@
     bool linhaE(){
         if(ReadLine()=="1 1 0 0 0" || ReadLine()=="1 0 0 0 0"){
         return true;
-    }
+        }
         else{
         return false;
         }
@@ -485,25 +521,81 @@
 
 //Função para calcular as posições do robô baseado na bussola
     void posição(){
-        if (valor_inicial >= 315 && valor_inicial <= 45) {
-             valor_inicial = 0;
-             valor_direita = 90;
-             valor_esquerda = 270;
+
+        if (valor_inicial >= 315 && valor_inicial <= 45){
+             valor_inicial = 1;
+             valor_direita = 91;
+             valor_esquerda = 271;
         } 
-        if (valor_inicial >= 45 && valor_inicial <= 135) {
-             valor_inicial = 90;
-             valor_direita = 180;
+
+        if (valor_inicial >= 45 && valor_inicial <= 135){
+             valor_inicial = 91;
+             valor_direita = 181;
              valor_esquerda = 1;
         } 
-        if (valor_inicial >= 135 && valor_inicial <=225) {
-             valor_inicial = 180;
-             valor_direita = 270;
-             valor_esquerda = 90;
+
+        if (valor_inicial >= 135 && valor_inicial <=225){
+             valor_inicial = 181;
+             valor_direita = 271;
+             valor_esquerda = 91;
         }
-        if (valor_inicial >= 225 && valor_inicial <= 315) {
-             valor_inicial = 270;
-             valor_direita = 353;
-             valor_esquerda = 180;
+
+        if (valor_inicial >= 225 && valor_inicial <= 315){
+             valor_inicial = 271;
+             valor_direita = 350;
+             valor_esquerda = 181;
+        }
+    }
+
+//Função para descobrir se o robô está torto
+    void discover(){
+
+        if(valor_inicial == 0){
+            if(bussolaValues() >= 1 && bussolaValues() <= 89){
+                tortoD = true;
+                tortoE = false;
+            }
+
+            if(bussolaValues() <= 359 && bussolaValues() >= 271){
+                tortoE = true;
+                tortoD = false;
+            }
+        }
+
+        if(valor_inicial == 90){
+            if(bussolaValues() >= 91 && bussolaValues() <= 179){
+                tortoD = true;
+                tortoE = false;
+            }
+
+            if(bussolaValues() <= 89 && bussolaValues() >= 1){
+                tortoE = false;
+                tortoD = true;
+            }
+        }
+
+        if(valor_inicial == 180){
+            if(bussolaValues() >= 181 && bussolaValues() <=269){
+                tortoD = true;
+                tortoE = false;
+            }
+
+            if(bussolaValues() <= 179 && bussolaValues() >= 91){
+                tortoE = true;
+                tortoD = false;   
+            }
+        }
+
+        if(valor_inicial == 270){
+            if(bussolaValues() >= 271 && bussolaValues() <= 359){
+                tortoD = true;
+                tortoE = false;
+            }
+
+            if(bussolaValues() <= 269 && bussolaValues() >= 181){
+                tortoE = true;
+                tortoD = false;
+            }
         }
     }
 
@@ -532,4 +624,6 @@
     }     
     }        
     }
-    */
+    ////////////////////////////////////////////
+
+        */
