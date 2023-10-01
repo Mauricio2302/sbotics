@@ -105,27 +105,59 @@
 // Começo da execução do Codigo
     async Task Main (){
         await GUP();
-        valor_inicial = bussolaValues();
         posição();
+        valor_inicial = bussolaValues();
+        await Time.Delay(2000);
         while(true){
-            //IO.PrintLine(Math.Truncate(bussolaValues()).ToString());
             await Time.Delay(50);
             ReadDistance();
             LineFollower();
-        //Casos do verde
-            if (verde_R()){
-                await R90();
+        //Casos do obstaculo
+            if (distanceF <= 2 && distanceF >= 0){
+                await obstaculo();
             }
 
-            if (verde_L()){
-                await L90();
-                continue;
+        //Casos do verde
+            if(verde_A()){
+	            if (verde_R() && verde_L()){
+                    await LR();
+            	    continue;
+                }
+
+	            if (verde_L()){
+                    await L90();
+            	    continue;
+                }
+
+	            if (verde_R()){
+                    await R90();
+            	    continue;
+                }
+            }
+
+
+
+        //Falso cruzamento do verde
+            if(full_line()){
+                frente(200,200);
+                await Time.Delay(1000);
             }
             
-        //Casos do obstaculo
-            if (distanceF <= 1  && distanceF >=0){
-                await obstaculo();
-            }         
+        //Casos para adicionar velocidade para subir a rampa
+            /*if(InclinationValues() <= 355 && InclinationValues() >= 300){
+                while(InclinationValues() <= 355 && InclinationValues()>= 300){
+                    await Time.Delay(50);
+                    LineFollowerR();
+                }
+            }*/
+
+        //Casos para subtrair velocidade para descer a rampa
+            if(InclinationValues() <= 100 && InclinationValues() >= 0){
+                while(InclinationValues() <= 100 && InclinationValues() >= 0){
+                    await Time.Delay(50);
+                    frente(90,90);
+                }
+            }        
         }
     }
     
@@ -318,7 +350,7 @@
                 error = 2;
                 break;
             case "0 0 0 1 1":
-                error = 4.5;
+                error = 5;
                 break;
             case "0 0 0 0 1":
                 error = 4;
@@ -330,23 +362,23 @@
                 error = -2;
                 break;
             case "1 1 0 0 0":
-                error = -4.5;
+                error = -5;
                 break;
             case "1 0 0 0 0":
                 error = -4;
                 break;
             case "1 1 1 1 0":
-                error = -4;
+                error = -5;
                 break;
             case "0 1 1 1 1":
-                error = 4;
+                error = 5;
                 break; 
 //Casos de 90º
             case "1 1 1 0 0": 
-                error = -4.5;
+                error = -5;
                 break;
             case "0 0 1 1 1":
-                error = 4.5;
+                error = 5;
                 break;
         }
     }
@@ -356,39 +388,55 @@
         Cases();
         P = Kp*error;
         destravar();
-        motor1.Apply(500, 150+P);
-        motor3.Apply(500, 150+P);
-        motor2.Apply(500, 150-P);
-        motor4.Apply(500, 150-P);
+        motor1.Apply(500, 180+P);
+        motor3.Apply(500, 180+P);
+        motor2.Apply(500, 180-P);
+        motor4.Apply(500, 180-P);
     }
+
+    void LineFollowerR(){
+        Cases();
+        P = Kp*error;
+        destravar();
+        motor1.Apply(400, 400+P);
+        motor3.Apply(400, 400+P);
+        motor2.Apply(400, 400-P);
+        motor4.Apply(400, 400-P);
+    }    
 
 //Funções de girar 90 Graus no verde
 
 //90º graus para a direita
     async Task R90(){
         frente(200,200);
-        await Time.Delay(700);
+        await Time.Delay(1000);
         direita(500, 500);
-        await Time.Delay(1100);
-        frente(200,200);
         await Time.Delay(700);
+        frente(200,200);
+        await Time.Delay(100);
     }
 
 //90º graus para a esquerda
     async Task L90(){
         frente(200,200);
-        await Time.Delay(700);
+        await Time.Delay(1000);
         esquerda(500, 500);
-        await Time.Delay(1100);
-        frente(200,200);
         await Time.Delay(700);
+        frente(200,200);
+        await Time.Delay(100);
+    }
+
+//Função de 180º verde
+    async Task LR(){
+        esquerda(300, 300);
+        await Time.Delay(3700); 
     }
 
 //Função de subir a garra
     async Task GUP(){
         braço.Locked = false;
         braço.Apply(500, 300);
-        await Time.Delay(3000);
+        await Time.Delay(2000);
     }
 
 //Função para o desvio de obstaculo
@@ -396,6 +444,7 @@
         ReadDistance();
         bool virei = false;
         bool virei2 = false;
+        bool virei3 = false;
         bool cabei = false;
         while(cabei == false){
             await Time.Delay(50);
@@ -409,7 +458,7 @@
         if(distanceE <= 10 && virei == true && virei2 == false ){
             IO.Print("socorro");
             frente(200,200);
-            await Time.Delay(1600);
+            await Time.Delay(1800);
             IO.PrintLine(valor_inicial.ToString());
             IO.PrintLine(bussolaValues().ToString());
                 while(bussolaValues() >= valor_inicial){
@@ -421,26 +470,27 @@
             await Time.Delay(1800);
             virei2 = true;
         if(full_line()){
-            while(bussolaValues() <= valor_inicial){
-                await Time.Delay(50);
-                direita(200,200);
-            }
+            frente(200,200);
+            await Time.Delay(500);
+            direita(300, 300);
+            await Time.Delay(1600);
             cabei = true;
             break;
         }
         
-        if(distanceE <= 10 && virei == true && virei2 == true){
+        if(distanceE <= 10 && virei == true && virei2 == true && virei3 == false){
             while(bussolaValues() >= valor_esquerda){
                     await Time.Delay(50);
                     esquerda(200,200);
             }
         }
+        virei3 = true;
 
         if(full_line()){
-            while(bussolaValues() <= valor_inicial){
-                await Time.Delay(50);
-                direita(200,200);
-            }
+            frente(200,200);
+            await Time.Delay(500);
+            direita(300, 300);
+            await Time.Delay(1600);
             cabei = true;
             break;
         }
