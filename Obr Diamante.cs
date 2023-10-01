@@ -52,6 +52,8 @@
     ColorSensor sensorR2 = Bot.GetComponent<ColorSensor>("sensorR2");
     ColorSensor sensorB = Bot.GetComponent<ColorSensor>("sensorB");
     ColorSensor sensorB2 = Bot.GetComponent<ColorSensor>("sensorB2");
+    ColorSensor bagColorR = Bot.GetComponent<ColorSensor>("bagColorR");
+    ColorSensor bagColorL = Bot.GetComponent<ColorSensor>("bagColorL");
 
 // Variáveis de cor Digitais
     bool corL;
@@ -59,6 +61,10 @@
     bool corM;
     bool corR;
     bool corR2;
+    bool bagL;
+    bool bagR;
+    bool corB;
+    bool corB2;
 
 // Variáveis de cor Analogicas
     string colorM;
@@ -66,6 +72,10 @@
     string colorL2;
     string colorR;
     string colorR2;
+    string BGL;
+    string BGR;
+    string colorB;
+    string colorB2;
 
 // Sensores de toque
     TouchSensor toque_E = Bot.GetComponent<TouchSensor>("toque_E"); 
@@ -73,8 +83,8 @@
     TouchSensor toque_M = Bot.GetComponent<TouchSensor>("toque_M"); 
 
 // Fases do percurso
-    bool resgate;
-    bool percurso;
+    bool resgate = false;
+    bool percurso = true;
     bool final;
     bool withvictmin;
     bool leftcube;
@@ -94,7 +104,7 @@
     double distanceT;
 
 // Constantes do PID
-    const double Kp = 90;
+    const double Kp = 95;
     double P;
     double error = 0;
 
@@ -109,55 +119,87 @@
         valor_inicial = bussolaValues();
         await Time.Delay(2000);
         while(true){
-            await Time.Delay(50);
-            ReadDistance();
-            LineFollower();
-        //Casos do obstaculo
-            if (distanceF <= 2 && distanceF >= 0){
-                await obstaculo();
+            while(percurso == true){
+                await Time.Delay(50);
+                ReadDistance();
+                LineFollower();
+
+                //Caso onde o sensor identifica a fita prata da area de resgate
+                if(prata("sensorM")){
+                    percurso = false;
+                    resgate = true;
+                }
+
+                //Casos para pegar o cubo
+                if(distanceG <= 1.5 && distanceF >= 20 && isgreen("bagColorL") && isgreen("bagColorR")  && prata("sensorB")|| prata("sensorB2")){
+                    await GetCube();
+                }
+
+                //Casos do obstaculo
+                if(distanceF <= 4 && distanceF >= 0){
+                    await obstaculo();
+                }
+
+                //Casos do verde
+                if(verde_A()){
+                    if (verde_R() && verde_L()){
+                        await LR();
+                        continue;
+                    }
+
+                    if (verde_L()){
+                        await L90();
+                        continue;
+                    }
+
+                    if (verde_R()){
+                        await R90();
+                        continue;
+                    }
+                }
+
+                //Falso cruzamento do verde
+                if(full_line()){
+                    frente(200,200);
+                    await Time.Delay(1000);
+                }
+
+                //90º para a direita
+                if(linhaD90()){
+                    direita(500, 500);
+                    await Time.Delay(800);
+                    frente(200, -200);
+                    await Time.Delay(800);
+                }
+
+                //90º para a esquerda
+                if(linhaE90()){
+                    esquerda(500, 500);
+                    await Time.Delay(800);
+                    frente(200, -200);
+                    await Time.Delay(800);
+                }
+                    
+                    //Casos para adicionar velocidade para subir a rampa
+                    /*if(InclinationValues() <= 355 && InclinationValues() >= 300){
+                        while(InclinationValues() <= 355 && InclinationValues()>= 300){
+                            await Time.Delay(50);
+                            LineFollowerR();
+                        }
+                    }*/
+
+                    //Casos para subtrair velocidade para descer a rampa
+                if(InclinationValues() <= 100 && InclinationValues() >= 3){
+                    while(InclinationValues() <= 100 && InclinationValues() >= 3){
+                        await Time.Delay(50);
+                        frente(180,180);
+                    }
+                }        
             }
+            while(resgate == true){
+                await Time.Delay(50);
 
-        //Casos do verde
-            if(verde_A()){
-	            if (verde_R() && verde_L()){
-                    await LR();
-            	    continue;
-                }
-
-	            if (verde_L()){
-                    await L90();
-            	    continue;
-                }
-
-	            if (verde_R()){
-                    await R90();
-            	    continue;
-                }
             }
-
-
-
-        //Falso cruzamento do verde
-            if(full_line()){
-                frente(200,200);
-                await Time.Delay(1000);
-            }
-            
-        //Casos para adicionar velocidade para subir a rampa
-            /*if(InclinationValues() <= 355 && InclinationValues() >= 300){
-                while(InclinationValues() <= 355 && InclinationValues()>= 300){
-                    await Time.Delay(50);
-                    LineFollowerR();
-                }
-            }*/
-
-        //Casos para subtrair velocidade para descer a rampa
-            if(InclinationValues() <= 100 && InclinationValues() >= 0){
-                while(InclinationValues() <= 100 && InclinationValues() >= 0){
-                    await Time.Delay(50);
-                    frente(90,90);
-                }
-            }        
         }
     }
     
@@ -367,19 +409,6 @@
             case "1 0 0 0 0":
                 error = -4;
                 break;
-            case "1 1 1 1 0":
-                error = -5;
-                break;
-            case "0 1 1 1 1":
-                error = 5;
-                break; 
-//Casos de 90º
-            case "1 1 1 0 0": 
-                error = -5;
-                break;
-            case "0 0 1 1 1":
-                error = 5;
-                break;
         }
     }
 
@@ -388,10 +417,10 @@
         Cases();
         P = Kp*error;
         destravar();
-        motor1.Apply(500, 180+P);
-        motor3.Apply(500, 180+P);
-        motor2.Apply(500, 180-P);
-        motor4.Apply(500, 180-P);
+        motor1.Apply(500, 160+P);
+        motor3.Apply(500, 160+P);
+        motor2.Apply(500, 160-P);
+        motor4.Apply(500, 160-P);
     }
 
     void LineFollowerR(){
@@ -439,6 +468,25 @@
         await Time.Delay(2000);
     }
 
+//Função de pegar o cubo
+    async Task GetCube(){
+        bool peguei = false;
+        while(peguei == false){
+            travar();
+            mão.Locked = false;
+            mão.Apply(500, 500);
+            await Time.Delay(1000);
+            braço.Apply(300, -200);
+            await Time.Delay(2000);
+            mão.Apply(300,-300);
+            await Time.Delay(900);
+            braço.Apply(200,150);
+            await Time.Delay(2000);
+            peguei = true;
+            break;
+        }   
+    }
+
 //Função para o desvio de obstaculo
     async Task obstaculo(){
         ReadDistance();
@@ -469,7 +517,7 @@
             frente(200,200);
             await Time.Delay(1800);
             virei2 = true;
-        if(full_line()){
+        if(full_line() && virei == true){
             frente(200,200);
             await Time.Delay(500);
             direita(300, 300);
@@ -486,7 +534,7 @@
         }
         virei3 = true;
 
-        if(full_line()){
+        if(full_line() && virei2 == true){
             frente(200,200);
             await Time.Delay(500);
             direita(300, 300);
@@ -531,7 +579,7 @@
 
 //Caso onde a linha preta se encontra nos sensores da esquerda e no meio
     bool linhaE90(){
-        if(ReadLine()=="1 1 1 0 0"){
+        if(ReadLine()=="1 1 1 0 0" || ReadLine()=="1 1 1 1 0"){
         return true;
         }
         else{
@@ -541,7 +589,7 @@
 
 //Caso onde a linha preta se encontra nos sensores da direita e no meio
     bool linhaD90(){
-        if(ReadLine()=="0 0 1 1 1"){
+        if(ReadLine()=="0 0 1 1 1" || ReadLine()== "1 1 1 1 0"){
         return true;
         }
         else{
