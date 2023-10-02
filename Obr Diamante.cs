@@ -88,6 +88,7 @@
     bool final;
     bool withvictmin;
     bool leftcube;
+    bool resgatando = false;
 
 // Sensores de distancia
     UltrasonicSensor ultra_D = Bot.GetComponent<UltrasonicSensor>("ultra_D"); 
@@ -131,7 +132,7 @@
                 }
 
                 //Casos para pegar o cubo
-                if(distanceG <= 1.5 && distanceF >= 20 && isgreen("bagColorL") && isgreen("bagColorR")  && prata("sensorB")|| prata("sensorB2")){
+                if(distanceG >= 1.5 && distanceG <= 2 && distanceF >= 300 && prata("sensorB")|| prata("sensorB2")){
                     await GetCube();
                 }
 
@@ -169,7 +170,7 @@
                     direita(500, 500);
                     await Time.Delay(800);
                     frente(200, -200);
-                    await Time.Delay(800);
+                    await Time.Delay(300);
                 }
 
                 //90º para a esquerda
@@ -177,7 +178,7 @@
                     esquerda(500, 500);
                     await Time.Delay(800);
                     frente(200, -200);
-                    await Time.Delay(800);
+                    await Time.Delay(300);
                 }
                     
                     //Casos para adicionar velocidade para subir a rampa
@@ -196,12 +197,18 @@
                     }
                 }        
             }
-            while(resgate == true){
+            while(resgate == true) {
                 await Time.Delay(50);
-
+                valor_inicial = bussolaValues();
+                frente(200,200);
+                await Time.Delay(200);
+                if(prata("bagColorR") || prata("bagColorL")){
+                    await give_cube();
+                }
             }
         }
     }
+    
     
     
 
@@ -466,6 +473,50 @@
         braço.Locked = false;
         braço.Apply(500, 300);
         await Time.Delay(2000);
+        braço.Locked = true;  
+    }
+
+//Função de abaixar a garra
+    async Task GDOWN(){
+        braço.Locked = false;
+        braço.Apply(300, -200);
+        await Time.Delay(2000);
+        braço.Locked = true;  
+    }
+
+//Função de dropar as vitimas e o cubo
+    async Task DROP(){
+        garra.Locked = false;
+        garra.Apply(500,500);
+        await Time.Delay(2000);
+        garra.Locked = true;
+    }
+
+//Função de depositar o cubo
+    async Task give_cube(){
+        bool cabei = false;
+        valor_inicial = bussolaValues();
+        ReadDistance();
+        while(cabei == false){
+            await Time.Delay(50);
+            ReadDistance();
+            destravar();
+            frente(200,200);
+
+            if(verde_A()){
+                await GDOWN();
+                direita(300, 300);
+                await Time.Delay(1000);
+                travar();
+                await DROP();
+                cabei = true;
+            }
+
+            if(distanceF <= 2 && distanceF >= 1){
+                direita(500, 500);
+                await Time.Delay(700);    
+            }    
+        }
     }
 
 //Função de pegar o cubo
@@ -473,13 +524,14 @@
         bool peguei = false;
         while(peguei == false){
             travar();
+            braço.Locked = false;
             mão.Locked = false;
             mão.Apply(500, 500);
             await Time.Delay(1000);
             braço.Apply(300, -200);
             await Time.Delay(2000);
             mão.Apply(300,-300);
-            await Time.Delay(900);
+            await Time.Delay(1400);
             braço.Apply(200,150);
             await Time.Delay(2000);
             peguei = true;
@@ -620,7 +672,7 @@
 //Função para calcular as posições do robô baseado na bussola
     void posição(){
 
-        if (valor_inicial >= 315 && valor_inicial <= 45){
+        if (valor_inicial >= 315 || valor_inicial <= 45){
              valor_inicial = 1;
              valor_direita = 91;
              valor_esquerda = 271;
@@ -724,4 +776,31 @@
     }
     ////////////////////////////////////////////
 
-        */
+        
+
+async Task gyrate(double angle, double speed){
+  IO.PrintLine(getCompassString());
+  double value = getCompass();
+  double focus = value + angle;
+  
+  double focusMarginP = focus + 5;
+  double focusMarginM = focus - 5;
+   string focusS = $"{focusMarginP}";
+  print(focusS); 
+  while((getCompass() <= focusMarginM || getCompass() >= focusMarginP)){
+    IO.PrintLine(getCompassString());
+    right(500, speed);
+     if(angle>0){
+      right(500, speed);
+    }
+    else{
+      left(500, speed);
+    } 
+   await Time.Delay(50);
+  }
+  print("saiu");
+  Lock();
+  stop();
+}
+*/
+
