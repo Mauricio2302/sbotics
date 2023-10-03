@@ -132,7 +132,7 @@
                 }
 
                 //Casos para pegar o cubo
-                if(distanceG >= 1.5 && distanceG <= 2 && distanceF >= 300 && prata("sensorB")|| prata("sensorB2")){
+                if(distanceG >= 1.3 && distanceG <= 1.7 && distanceF >= 300 && prata("sensorB")|| prata("sensorB2")){
                     await GetCube();
                 }
 
@@ -803,4 +803,3 @@ async Task gyrate(double angle, double speed){
   stop();
 }
 */
-
